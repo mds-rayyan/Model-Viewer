@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>____________Model Viewer_________</title>
+    <title>Kodak Interactve Web Store</title>
     <style>
         body {
             margin: 0;
@@ -38,10 +38,10 @@
     
     <script src="three.js"></script>
     <script src="GLTFLoader.js"></script>
-    <script src="OrbitControls.js"></script>
     <script src="FirstPersonControls.js"></script>
     <script src="Stats.js"></script>
     <script src="gsap.js"></script>
+    <script src="RectAreaLightHelper.js"></script>
 
     <script>
         var mixer, historyMixer, hudMixer, productMixer, selectedProduct, selecttionCoordinates, currentProductIndex, nextProductName;
@@ -52,13 +52,13 @@
         // Load Camera Perspektive
         var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         camera.position.x = -1
-        camera.position.y = 6
+        camera.position.y = 4
         camera.position.z = 30
-        camera.lookAt(new THREE.Vector3(1,6,-20));
+        camera.lookAt(new THREE.Vector3(1,4,-20));
 
         // Load a Renderer
         var renderer = new THREE.WebGLRenderer({
-            alpha: false
+            alpha: false,
         });
         renderer.setClearColor(0xC5C5C3);
         renderer.setPixelRatio(window.devicePixelRatio);
@@ -101,6 +101,36 @@
         dirLight.shadow.camera.far = 200;
         dirLight.shadow.mapSize.set( 1024, 1024 );
         scene.add( dirLight );
+
+        // const LeftLastCamLight = new THREE.RectAreaLight( 0xffffff, 40, 0.5, 2 );
+		// 		LeftLastCamLight.position.set( -12.18,6.67,9.66 );
+        //         LeftLastCamLight.lookAt(-12.18,2.6,9.66);
+		// 		scene.add( LeftLastCamLight );
+
+		// 		const LeftFirstCamLight = new THREE.RectAreaLight( 0xffffff, 40, 0.5, 2 );
+		// 		LeftFirstCamLight.position.set( -11.11,6.67,-2.9 );
+        //         LeftFirstCamLight.lookAt(-11.9,2.86,-3.2);
+		// 		scene.add( LeftFirstCamLight );
+
+		// 		const RightFirstPrintLight = new THREE.RectAreaLight( 0xffffff, 40, 0.5, 2 );
+		// 		RightFirstPrintLight.position.set( 10.3,6.67,21.9 );
+        //         RightFirstPrintLight.lookAt(10.3,3.8,21.9);
+		// 		scene.add( RightFirstPrintLight );
+
+        //         const RightSecondPrintLight = new THREE.RectAreaLight( 0xffffff, 40, 0.5, 2 );
+		// 		RightSecondPrintLight.position.set( 9.6,6.7,9.6 );
+        //         RightSecondPrintLight.lookAt(9.6,3.6,9.6);
+		// 		scene.add( RightSecondPrintLight );
+
+        //         const RightThirdPrintLight = new THREE.RectAreaLight( 0xffffff, 40, 0.5, 2 );
+		// 		RightThirdPrintLight.position.set( 9.86,6.7,4 );
+        //         RightThirdPrintLight.lookAt(9.86,3.7,3.2);
+		// 		scene.add( RightThirdPrintLight );
+
+
+        //         scene.add( new RectAreaLightHelper( LeftLastCamLight ) );
+		// 		scene.add( new RectAreaLightHelper( LeftFirstCamLight ) );
+		// 		scene.add( new RectAreaLightHelper( RightFirstPrintLight ) );
 
         /*----------------------------------  Arrow Helper ------------------------------------*/
 
@@ -254,9 +284,9 @@
 
         // creating camera standing postion
         const standing_position = {
-            "C210R-001":{"x":-7,"y":3,"z":9.5},
-            "C210R-002":{"x":-6,"y":3,"z":-3},
-            "P300R001":{"x":4,"y":3.5,"z":-3},
+            "C210R-001":{"x":-7,"y":4,"z":9.5},
+            "C210R-002":{"x":-6,"y":4,"z":-3},
+            "P300R001":{"x":4,"y":4,"z":-3},
             "P300R":{"x":5,"y":4,"z":9},
             "P300R002":{"x":5,"y":4,"z":21}
         }
@@ -272,8 +302,8 @@
                 document.body.style.cursor = "auto"
             }, 1000);
             document.body.style.cursor = "grabbing"
-// See if the ray from the camera into the world hits one of our meshes
-const intersects = raycaster.intersectObject(productsGltfObject, true);
+            // See if the ray from the camera into the world hits one of our meshes
+            const intersects = raycaster.intersectObject(productsGltfObject, true);
             if(intersects && intersects.length > 0 ) {
 
             selecttionCoordinates = intersects[0].point;
@@ -341,9 +371,9 @@ const intersects = raycaster.intersectObject(productsGltfObject, true);
                     z:  standing_position[nextProductName].z,
                     onUpdate: function() {
                         if (nextProductName ==='C210R-001' || nextProductName ==='C210R-002') {
-                            camera.lookAt( new THREE.Vector3(-200,0,0) );
+                            camera.lookAt( new THREE.Vector3(-200,4,0) );
                         } else {
-                            camera.lookAt( new THREE.Vector3(200,0,0) );
+                            camera.lookAt( new THREE.Vector3(200,4,0) );
                         }
                         
                     }
