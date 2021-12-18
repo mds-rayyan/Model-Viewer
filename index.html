@@ -2,10 +2,11 @@
 <html>
 
 <head>
-    <title>____________Model Viewer_________</title>
+    <title>Kodak Interactve Web Store</title>
     <style>
         body {
             margin: 0;
+            
         }
 
         canvas {
@@ -37,26 +38,27 @@
     
     <script src="three.js"></script>
     <script src="GLTFLoader.js"></script>
+    <script src="FirstPersonControls.js"></script>
     <script src="Stats.js"></script>
     <script src="gsap.js"></script>
-    <script src="OrbitControls.js"></script>
+    <script src="RectAreaLightHelper.js"></script>
 
     <script>
-        var mixer, historyMixer, hudMixer, productMixer;
+        var mixer, historyMixer, hudMixer, productMixer, selectedProduct, selecttionCoordinates, currentProductIndex, nextProductName;
         var clock = new THREE.Clock();
         // Load 3D Scene
         var scene = new THREE.Scene();
 
         // Load Camera Perspektive
         var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.x = -2
-        camera.position.y = 6
+        camera.position.x = -1
+        camera.position.y = 4
         camera.position.z = 30
-        camera.lookAt(new THREE.Vector3(2,6,-20));
+        camera.lookAt(new THREE.Vector3(1,4,-20));
 
         // Load a Renderer
         var renderer = new THREE.WebGLRenderer({
-            alpha: false
+            alpha: false,
         });
         renderer.setClearColor(0xC5C5C3);
         renderer.setPixelRatio(window.devicePixelRatio);
@@ -67,46 +69,6 @@
         renderer.outputEncoding = THREE.sRGBEncoding;
         document.body.appendChild(renderer.domElement);
 
-        // var camControls = new THREE.FirstPersonControls(camera);
-        // camControls.lookSpeed = 10;
-        // camControls.movementSpeed = 100;
-        // camControls.noFly = true;
-        // camControls.lookVertical = true;
-        // camControls.constrainVertical = true;
-        // camControls.verticalMin = 1.0;
-        // camControls.verticalMax = 2.0;
-        // camControls.lon = -150;
-        // camControls.lat = 120;
-
-        controls = new THREE.OrbitControls( camera, renderer.domElement );
-        controls.enableDamping = true;
-        controls.dampingFactor = 0.25;
-        controls.enableZoom = false;
-        controls.autoRotate = false;
-        controls.target.set(.5, 5, .5)
-        controls.update()
-
-        controls.keys = {
-            LEFT: "ArrowLeft", //left arrow
-            UP: "ArrowUp", // up arrow
-            RIGHT: "ArrowRight", // right arrow
-            BOTTOM: "ArrowDown" // down arrow
-        }
-        controls.mouseButtons = {
-            LEFT: THREE.MOUSE.ROTATE,
-            MIDDLE: THREE.MOUSE.DOLLY,
-            RIGHT: THREE.MOUSE.PAN
-        }
-        controls.touches = {
-            ONE: THREE.TOUCH.ROTATE,
-            TWO: THREE.TOUCH.DOLLY_PAN
-        }
-        controls.screenSpacePanning = true
-controls.minPolarAngle = 0
-controls.maxPolarAngle = Math.PI / 2
-controls.maxDistance = 15
-controls.minDistance = 0.1
-
 
         // raycaster and pointer objects
         const raycaster = new THREE.Raycaster();
@@ -115,6 +77,8 @@ controls.minDistance = 0.1
         // Stats object to display frame rate
         var stats = new Stats();
         document.body.appendChild(stats.domElement);
+
+        /*----------------------------------  Lights ------------------------------------*/
 
         // Adding Ambient light
         hlight = new THREE.AmbientLight(0xffffff, 0.8);
@@ -138,8 +102,76 @@ controls.minDistance = 0.1
         dirLight.shadow.mapSize.set( 1024, 1024 );
         scene.add( dirLight );
 
+        // const LeftLastCamLight = new THREE.RectAreaLight( 0xffffff, 40, 0.5, 2 );
+		// 		LeftLastCamLight.position.set( -12.18,6.67,9.66 );
+        //         LeftLastCamLight.lookAt(-12.18,2.6,9.66);
+		// 		scene.add( LeftLastCamLight );
+
+		// 		const LeftFirstCamLight = new THREE.RectAreaLight( 0xffffff, 40, 0.5, 2 );
+		// 		LeftFirstCamLight.position.set( -11.11,6.67,-2.9 );
+        //         LeftFirstCamLight.lookAt(-11.9,2.86,-3.2);
+		// 		scene.add( LeftFirstCamLight );
+
+		// 		const RightFirstPrintLight = new THREE.RectAreaLight( 0xffffff, 40, 0.5, 2 );
+		// 		RightFirstPrintLight.position.set( 10.3,6.67,21.9 );
+        //         RightFirstPrintLight.lookAt(10.3,3.8,21.9);
+		// 		scene.add( RightFirstPrintLight );
+
+        //         const RightSecondPrintLight = new THREE.RectAreaLight( 0xffffff, 40, 0.5, 2 );
+		// 		RightSecondPrintLight.position.set( 9.6,6.7,9.6 );
+        //         RightSecondPrintLight.lookAt(9.6,3.6,9.6);
+		// 		scene.add( RightSecondPrintLight );
+
+        //         const RightThirdPrintLight = new THREE.RectAreaLight( 0xffffff, 40, 0.5, 2 );
+		// 		RightThirdPrintLight.position.set( 9.86,6.7,4 );
+        //         RightThirdPrintLight.lookAt(9.86,3.7,3.2);
+		// 		scene.add( RightThirdPrintLight );
 
 
+        //         scene.add( new RectAreaLightHelper( LeftLastCamLight ) );
+		// 		scene.add( new RectAreaLightHelper( LeftFirstCamLight ) );
+		// 		scene.add( new RectAreaLightHelper( RightFirstPrintLight ) );
+
+        /*----------------------------------  Arrow Helper ------------------------------------*/
+
+        // // ARROW HELPER
+        // var yAxis = new THREE.ArrowHelper(
+        //     // first argument is the direction
+        //     new THREE.Vector3(0, 2, 0).normalize(),
+        //     // second argument is the origin
+        //     new THREE.Vector3(0, 0, 0),
+        //     // length
+        //     25,
+        //     // color
+        //     0xFFFF00);
+        // scene.add(yAxis);
+
+        // // ARROW HELPER
+        // var xAxis = new THREE.ArrowHelper(
+        //     // first argument is the direction
+        //     new THREE.Vector3(2, 0, 0).normalize(),
+        //     // second argument is the origin
+        //     new THREE.Vector3(0, 0, 0),
+        //     // length
+        //     25,
+        //     // color
+        //     0x00ff00);
+        // scene.add(xAxis);
+
+        // // ARROW HELPER
+        // var zAxis = new THREE.ArrowHelper(
+        //     // first argument is the direction
+        //     new THREE.Vector3(0, 0, 2).normalize(),
+        //     // second argument is the origin
+        //     new THREE.Vector3(0, 0, 0),
+        //     // length
+        //     25,
+        //     // color
+        //     0x0000FF);
+        // scene.add(zAxis);
+
+
+        /*---------------------------------- Loading ------------------------------------*/
 
         const manager = new THREE.LoadingManager();
         var loaderElement = document.getElementById("loader");
@@ -151,6 +183,19 @@ controls.minDistance = 0.1
             console.log("Scene loaded");
         }
 
+        /*--------------------------------------orbit controller ---------------------------------*/
+        // Load the Orbitcontroller
+        var controls = new THREE.FirstPersonControls(camera, renderer.domElement);
+            // restrict user from free navigation
+            // controls.minDistance = 5;
+            // controls.maxDistance = 15;
+            // controls.minPolarAngle = 0;
+            // controls.maxPolarAngle = Math.PI * 0.5;
+            // controls.enablePan = false;
+            // controls.update();
+
+
+        /*----------------------------------  Load GLTF models ------------------------------------*/
 
         // glTf 2.0 Loader
         var loader = new THREE.GLTFLoader(manager);
@@ -182,9 +227,10 @@ controls.minDistance = 0.1
             scene.add(gltf.scene);
         });
 
+        var productsGltfObject;
         var loader1 = new THREE.GLTFLoader();
         loader1.load('gltf_model/Products-v2(withoutHUD).gltf', function (gltf) {
-            gltfObject = gltf.scene;
+            productsGltfObject = gltf.scene;
             gltf.scene.scale.set(2, 2, 2);
             gltf.scene.position.x = 0; //Position (x = right+ left-)
             gltf.scene.position.y = 0; //Position (y = up+, down-)
@@ -214,9 +260,10 @@ controls.minDistance = 0.1
             scene.add(gltf.scene);
         });
 
+        /*----------------------------------  GLTF model loading end ------------------------------------*/
+
         function animate() {
             stats.update();
-            controls.update();
             requestAnimationFrame(animate);
             var delta = clock.getDelta();
             if (mixer) mixer.update(delta);
@@ -233,42 +280,126 @@ controls.minDistance = 0.1
         render();
         animate();
 
+        /*----------------------------------  Mouse Click ------------------------------------*/
+
+        // creating camera standing postion
+        const standing_position = {
+            "C210R-001":{"x":-7,"y":4,"z":9.5},
+            "C210R-002":{"x":-6,"y":4,"z":-3},
+            "P300R001":{"x":4,"y":4,"z":-3},
+            "P300R":{"x":5,"y":4,"z":9},
+            "P300R002":{"x":5,"y":4,"z":21}
+        }
+
         // pointer click event to teleport
-        // document.addEventListener('pointerup', onPointerclick);
+        document.addEventListener('pointerup', onPointerclick);
 
         function onPointerclick(event) {
-
             pointer.x = (event.clientX / renderer.domElement.clientWidth) * 2 - 1;
             pointer.y = -(event.clientY / renderer.domElement.clientHeight) * 2 + 1;
             raycaster.setFromCamera(pointer, camera);
-
+            const mytimeout = setTimeout(() => {
+                document.body.style.cursor = "auto"
+            }, 1000);
+            document.body.style.cursor = "grabbing"
             // See if the ray from the camera into the world hits one of our meshes
-            const intersects = raycaster.intersectObject(gltfObject, true);
+            const intersects = raycaster.intersectObject(productsGltfObject, true);
+            if(intersects && intersects.length > 0 ) {
 
-            if (intersects[0] && intersects[0].point && intersects[0].point.x < 0){
+            selecttionCoordinates = intersects[0].point;
+            
+            if (intersects[0].object.name in standing_position){
+                currentProductIndex = Object.keys(standing_position).findIndex(x => x === intersects[0].object.name);
                 gsap.to(camera.position,{
                     duration:3,
-                    x : intersects[0].point.x + 6,
-                    y:intersects[0].point.y,
-                    z:intersects[0].point.z
-                })
-            } else if (intersects[0] && intersects[0].point && intersects[0].point.x >0){
-                gsap.to(camera.position,{
-                    duration:3,
-                    x : intersects[0].point.x - 6,
-                    y:intersects[0].point.y,
-                    z:intersects[0].point.z
-                })
-            };
+                    x : standing_position[intersects[0].object.name].x,
+                    y:  standing_position[intersects[0].object.name].y,
+                    z:  standing_position[intersects[0].object.name].z,
+                    onUpdate: () => {
+                        camera.lookAt( intersects[0].point );
+                    }
+                });
+                
+            }
+            console.log(intersects[0].object.name);
+            }
+            
         
-            console.log(intersects.position);
-            console.log(intersects[0].object.material.type)
+            
+            
         }
 
 
-        //document.addEventListener( 'mousemove', onMouseMove );
+        document.addEventListener("keydown", onDocumentKeyDown);
+        function onDocumentKeyDown(event) {
+            if (event.keyCode == 65 || event.keyCode == 37) {
+                fetchProduct('PREV');
+            } else if (event.keyCode == 68 || event.keyCode == 39) {
+                fetchProduct('NEXT');
+            } else if (event.keyCode == 27) {
+                resetPosition();
+            }
+            
+        };
+        
+        function resetPosition() {
+            gsap.to(camera.position,{
+                duration:3,
+                x : -1,
+                y:  6,
+                z:  30,
+                onUpdate: function() {
+                    camera.lookAt( new THREE.Vector3(selecttionCoordinates.x,selecttionCoordinates.y,selecttionCoordinates.z) );
+                }
+            });
+        };
 
-        function onMouseMove( event ) {
+        function fetchProduct(direction){
+            let nextIndex;
+            if (direction === 'NEXT') {
+                nextIndex = (currentProductIndex + 1) > 4 ? 0 :  (currentProductIndex + 1);
+            } else if (direction === 'PREV'){
+                nextIndex = (currentProductIndex - 1) < 0 ? 4 :  (currentProductIndex - 1);
+            }
+            
+            nextProductName = Object.keys(standing_position)[nextIndex];
+            
+            gsap.to(camera.position,{
+                    duration:3,
+                    x : standing_position[nextProductName].x,
+                    y:  standing_position[nextProductName].y,
+                    z:  standing_position[nextProductName].z,
+                    onUpdate: function() {
+                        if (nextProductName ==='C210R-001' || nextProductName ==='C210R-002') {
+                            camera.lookAt( new THREE.Vector3(-200,4,0) );
+                        } else {
+                            camera.lookAt( new THREE.Vector3(200,4,0) );
+                        }
+                        
+                    }
+                });
+            currentProductIndex = nextIndex;
+        }
+
+        document.addEventListener( 'resize', onWindowResize );
+
+        function onWindowResize() {
+
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+
+            renderer.setSize( window.innerWidth, window.innerHeight );
+
+        }
+        
+
+        let mouseDownBool
+        let downListener = () => {
+            mouseDownBool = true
+        }
+        document.addEventListener('pointerdown', downListener)
+        let moveListener = () => {
+        if (mouseDownBool) {
             const _euler = new THREE.Euler( 0, 0, 0, 'YXZ' );
             const _PI_2 = Math.PI / 2;
             var minPolarAngle = 0; // radians
@@ -282,8 +413,16 @@ controls.minDistance = 0.1
             _euler.x -= movementY * 0.002;
             _euler.x = Math.max( _PI_2 - maxPolarAngle, Math.min( _PI_2 - minPolarAngle, _euler.x ) );
             camera.quaternion.setFromEuler( _euler );
-
+        } else {
+            console.log('not moved')
         }
+        }
+        document.addEventListener('mousemove', moveListener)
+        let upListener = () => {
+            mouseDownBool = false
+        }
+        document.addEventListener('pointerup', upListener) 
+        
 
         
     </script>
